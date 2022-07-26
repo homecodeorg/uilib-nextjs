@@ -1,26 +1,20 @@
-html,
-body {
-  padding: 0;
-  margin: 0;
-  font-family: -apple-system, BlinkMacSystemFont, Segoe UI, Roboto, Oxygen,
-    Ubuntu, Cantarell, Fira Sans, Droid Sans, Helvetica Neue, sans-serif;
-}
 
-a {
-  color: inherit;
-  text-decoration: none;
-}
 
+/* ---------- UILIB required resets: ------------ */
 * {
+  margin: 0;
+  padding: 0;
+  border: 0;
+  outline: none;
   box-sizing: border-box;
 }
+/* ---------- UILIB required resets: ------------ */
 
-@media (prefers-color-scheme: dark) {
-  html {
-    color-scheme: dark;
-  }
-  body {
-    color: white;
-    background: black;
-  }
+body {
+  background-color: var(--decent-color);
+  color: var(--accent-color);
+}
+
+*::selection {
+  background-color: var(--active-color-alpha-500);
 }
