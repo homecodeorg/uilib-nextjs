@@ -4,6 +4,7 @@ import {
   VH,
   Theme,
   ThemeHelpers,
+  ThemeDefaults,
   AssistiveText,
   ButtonGroup,
   Checkbox,
@@ -23,43 +24,51 @@ import {
   Router,
   Link,
 } from "@foreverido/uilib";
-import "moment/locale/ru"; // required for <DateTime locale="ru">
 import Time from "timen";
 import { createStore, withStore } from "justorm/react";
 
 import styles from "../styles/Home.module.css";
-import { useCallback, useEffect } from "react";
+import { useCallback, useEffect, useState } from "react";
 
 // ---------- Theme
 const { colorsConfigToVars } = ThemeHelpers;
-const colorsAlphaModes = [0, 50, 100, 200, 500, 800, 900];
-const darkColor = ["#171717", { alpha: colorsAlphaModes }];
-const lightColor = ["#e6e6e6", { alpha: colorsAlphaModes }];
+const { colors, getColors, getConfig } = ThemeDefaults;
 
-export const colors = {
-  active: [
-    "#c0990c",
-    { alpha: [100, 300, 500, 800] /* mix: [['accent', 300]] */ },
-  ],
-  warning: ["#ffa31a", { alpha: [100, 200, 500] }],
-  danger: ["#da3749", { alpha: [100, 300, 500] }],
-  disable: "#f1f1f2",
-  link: "#3089fe",
-  accent: lightColor,
-  decent: darkColor,
+const activeColor = "#00ff00";
+const defaultColors = getColors();
+const defaultConfig = getConfig();
+
+const colorsConfig = {
+  light: {
+    ...colorsConfigToVars({
+      ...getColors({
+        accent: colors.dark,
+        decent: colors.light,
+      }),
+    }),
+  },
+  dark: {
+    ...colorsConfigToVars({
+      ...getColors({
+        accent: colors.light,
+        decent: colors.dark,
+      }),
+    }),
+  },
 };
-const defaultConfig = {
-  "indent-s": "10px",
-  "indent-m": "20px",
-  "indent-l": "30px",
-  "border-radius-s": "2px",
-  "border-radius-m": "4px",
-  "border-radius-l": "6px",
-};
-const themeConfig = {
-  ...colorsConfigToVars(colors),
+
+const getThemeConfig = (theme, activeColor) => ({
   ...defaultConfig,
-};
+  ...colorsConfig[theme],
+  ...colorsConfigToVars({
+    active: {
+      color: activeColor, // update activeColor
+      mods: defaultColors.active.mods, // save activeColor mods
+    },
+  }),
+});
+
+const getThemeName = (isDark) => (isDark ? "dark" : "light");
 // ---------- Theme
 
 // ---------- Select
@@ -194,6 +203,16 @@ const date = new Date("11.08.2020");
 const Home: NextPage = ({ store: { router, example } }) => {
   const { data } = example.originalObject;
   const itemsCount = data.length;
+  const [isDark, setIsDark] = useState(true);
+  const [config, setConfig] = useState(
+    getThemeConfig(getThemeName(isDark), activeColor)
+  );
+
+  const toggle = () => {
+    const themeName = getThemeName(!isDark);
+    setConfig(getThemeConfig(themeName, activeColor));
+    setIsDark(!isDark);
+  };
 
   useEffect(() => {
     loadNextData(0, PAGE_SIZE).then(setData);
@@ -207,14 +226,23 @@ const Home: NextPage = ({ store: { router, example } }) => {
   return (
     <div className={styles.container}>
       <VH />
-      <Theme config={themeConfig} />
+      <Theme config={config} />
+      <Checkbox label="Dark theme" onChange={toggle} checked={isDark} />
+
       <ButtonGroup>
         <Button>asdasdasd</Button>
         <Button>1231231</Button>
       </ButtonGroup>
       <AssistiveText>123123123</AssistiveText>
-      <Checkbox label="123123123" onChange={() => {}} checked size="m" />
+      <Checkbox
+        id="accept"
+        label="123123123"
+        onChange={() => {}}
+        checked
+        size="m"
+      />
       <Input
+        suppressHydrationWarning
         type="textarea"
         label="Textarea example label"
         value="123123"
@@ -246,7 +274,7 @@ const Home: NextPage = ({ store: { router, example } }) => {
       />
       <Spinner />
       <Icon type="check" size="m" />
-      <DateTime value={date} format="DD.MM.YYYY" format="toNow" locale="ru" />
+      <DateTime value={date} format="DD.MM.YYYY" format="toNow" />
       <Scroll
         x
         y

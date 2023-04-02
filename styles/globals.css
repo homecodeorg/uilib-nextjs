@@ -1,5 +1,3 @@
-
-
 /* ---------- UILIB required resets: ------------ */
 * {
   margin: 0;
@@ -13,6 +11,7 @@
 body {
   background-color: var(--decent-color);
   color: var(--accent-color);
+  font-family: sans-serif;
 }
 
 *::selection {
